@@ -1,2 +1,10 @@
 # Project exclude paths
 /cmake-build-debug/
+/2023-04-25.1849-1906.pcap
+/.idea/.gitignore
+/.idea/.name
+/.idea/deployment.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/pcap_simba_parser.iml
+/.idea/vcs.xml
