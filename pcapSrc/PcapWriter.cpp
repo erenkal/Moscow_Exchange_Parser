@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "PcapWriter.h"
-#include "Parser.h"
+#include "../Parser.h"
 #include "PCAPStructs.h"
 
 void PcapWriter::writePackets(std::queue<std::string> queue,std::ofstream & outfile) { //parse the pcap strings and write data to file
@@ -32,12 +32,12 @@ void PcapWriter::writePackets(std::queue<std::string> queue,std::ofstream & outf
 //        }
 //        index += UDP_HEADER_LENGTH; // index is now at the end of UDP header length field
 //        // index is now at the beginning of UDP payload
-         int index = 57;
+        int index = 57;
 
-        std::string_view udpPayload = packet.substr(index);
+        std::string_view udpPayload = packet.substr(index+1); // index is +1 because of the 0 indexing of string
 //        std::cout << "UDP payload: " << udpPayload << std::endl;
 
-        //make buffered writer
+        //a primitive buffered writer
         output.append(udpPayload);
         if (i % 100000 == 0) {
             std::cout << "Writing packet " << i << " to file." << std::endl;

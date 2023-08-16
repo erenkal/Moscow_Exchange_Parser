@@ -13,9 +13,7 @@ class PcapWriter {
 
 
 public:
-    explicit PcapWriter() {
-
-    }
+    PcapWriter() = default;
 
     void writePackets(std::queue<std::string> queue,std::ofstream & outfile);
 
