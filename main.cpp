@@ -6,7 +6,10 @@
 #include "SimbaReader.h"
 #include "SimbaWriter.h"
 #include <queue>
+#include <thread>
 #include "3rdParty/NanoLog.h"
+#include "3rdParty/readerwriterqueue.h"
+
 
 
 
@@ -25,7 +28,7 @@ void startNanoLog (const std::string& outputFile) {
      * I have changed source code to not write any log type message (like timestamps etc.)
      * It only writes the message itself.
      * */
-    nanolog::initialize(nanolog::NonGuaranteedLogger(128), "./log", outputFile, 2000);
+    nanolog::initialize(nanolog::NonGuaranteedLogger(128), "./", outputFile, 2000);
     nanolog::set_log_level(nanolog::LogLevel::INFO);
     LOG_CRIT << "Starting Simba Parser";
 }
@@ -88,18 +91,29 @@ int main(int argc, char* argv[]) {
         std::queue<std::string> packets;
         SimbaReader reader(64);
         int i = 0;
+        moodycamel::ReaderWriterQueue<std::string> asyncPackets(200000);
+        auto decoder = std::thread([&](){
+            SimbaWriter::writePackets(asyncPackets);
+        });
+        decoder.detach();
         while (reader.ReadToBuffer(inputStream)){
-            reader.SplitPacketsFromBuffer(packets);
+            reader.SplitPacketsFromBuffer(asyncPackets);
             std::cout << i++ << "th buffer read" <<std::endl;
         }
         std::cout << "finished reading" << std::endl;
+        asyncPackets.enqueue("EOF");
 
         SimbaWriter writer;
         std::ofstream outputStream(output_file, std::ios::binary);
-        writer.writePackets(packets,outputStream);
 
+        while (true){
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
 
     }
+
+
+
 
 
 

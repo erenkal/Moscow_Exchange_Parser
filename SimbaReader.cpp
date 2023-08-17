@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "SimbaReader.h"
 #include "pcapSrc/PcapReader.h"
+#include "3rdParty/readerwriterqueue.h"
 
 SimbaReader::SimbaReader(uint32_t readChunkSizeInMB) {
     readChunkSize = readChunkSizeInMB * 1024 * 1024;
@@ -32,7 +33,7 @@ bool SimbaReader::ReadToBuffer(std::ifstream& infile) {
     return true;
 }
 
-void SimbaReader::SplitPacketsFromBuffer(std::queue<std::string> &queue) {
+void SimbaReader::SplitPacketsFromBuffer(moodycamel::ReaderWriterQueue<std::string> &queue) {
     size_t curIndex = 0;
 
     while (curIndex < buffer.size()) {

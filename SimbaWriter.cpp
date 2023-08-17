@@ -6,27 +6,35 @@
 #include "SimbaStructs.h"
 #include "3rdParty/NanoLog.h"
 
-void SimbaWriter::writePackets(std::queue <std::string> queue, std::ofstream &outfile) {
+
+
+
+void SimbaWriter::writePackets(moodycamel::ReaderWriterQueue<std::string> &queue) {
     std::cout << "Writing packets to file... \n [" << std::flush;
     uint64_t startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); // simple benchmark tool
-    int mod = queue.size()/20;
-    int queueSize = queue.size();
-    while (!queue.empty()) {
-        std::string_view packet = queue.front();
-//        MarketDataPacketHeader header (packet);
-//        ParsePacket(packet ,header.isIncremental());
-        MarketDataPacket mdp(packet);
-        queue.pop();
-        //cout a loading bar
-        if (queue.size() % mod == 0) {
+    int mod = 100000; // print a loading bar every 100000 packets
+    int packetCount = 0;
+    while (true) {
+        std::string packet;
+        bool result = queue.try_dequeue(packet);
+
+         if (!result) UNLIKELY  // if queue is empty continue polling
+            continue;
+         if (packet == "EOF") UNLIKELY  // a hardcoded EOF packet is sent to the queue to indicate the end of the file
+            break;
+        if (packetCount % mod == 0) UNLIKELY  // print a loading bar every 100000 packets
             std::cout << "#" << std::flush;
-        }
+
+
+        MarketDataPacket mdp(packet);
         LOG_CRIT << (mdp.to_string());
+
+        packetCount++;
     }
     uint64_t endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     std::cout << "]" << std::endl;
     std::cout << "Writing took " << endTime - startTime << " milliseconds" << std::endl;
-    std::cout << "Average packet time: " << (endTime - startTime)*1000 / queueSize << std::endl;
+    std::cout << "Average packet time: " << (endTime - startTime)*1000 / packetCount << std::endl;
 
 
 }

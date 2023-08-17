@@ -221,8 +221,9 @@ struct MarketDataPacket {
     std::variant<std::monostate, IncrementalPacket, SnapshotPacket> packet;
     explicit MarketDataPacket(std::string_view buf) : header(MarketDataPacketHeader(buf)) {
         std::string_view packetBuffer = buf.substr(MARKET_DATA_PACKET_HEADER_LENGTH);
-        if (header.isIncremental())
+        if (header.isIncremental()) LIKELY {
             packet = IncrementalPacket(packetBuffer, header.msg_size - MARKET_DATA_PACKET_HEADER_LENGTH);
+        }
         else {
             packet = SnapshotPacket(packetBuffer, header.msg_size - MARKET_DATA_PACKET_HEADER_LENGTH);
 //            std::cout << "Packet: " << std::get<SnapshotPacket>(packet).to_string() << std::endl;

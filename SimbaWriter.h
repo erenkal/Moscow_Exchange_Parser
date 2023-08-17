@@ -8,6 +8,7 @@
 
 #include <queue>
 #include <fstream>
+#include "3rdParty/readerwriterqueue.h"
 
 class SimbaWriter {
 
@@ -21,7 +22,7 @@ public:
     SimbaWriter& operator=(const SimbaWriter&) = delete;
     SimbaWriter(SimbaWriter&&) = delete;
 
-    void writePackets(std::queue<std::string> queue,std::ofstream & outfile);
+    static void writePackets(moodycamel::ReaderWriterQueue<std::string> &queue);
 };
 
 

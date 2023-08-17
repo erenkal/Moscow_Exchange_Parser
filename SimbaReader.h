@@ -11,6 +11,7 @@
 #include <queue>
 #include "SimbaStructs.h"
 #include "Parser.h"
+#include "3rdParty/readerwriterqueue.h"
 #include <iostream>
 
 
@@ -20,7 +21,7 @@ public:
     SimbaReader(const SimbaReader&) = delete;
     SimbaReader& operator=(const SimbaReader&) = delete;
     SimbaReader(SimbaReader&&) = delete;
-    void SplitPacketsFromBuffer(std::__1::queue<std::string> &queue);
+    void SplitPacketsFromBuffer(moodycamel::ReaderWriterQueue<std::string> &queue);
 
     static inline std::optional<size_t> GetDatagramLength(std::string_view buf)  {
         if (buf.size() < sizeof(MarketDataPacketHeader)) return std::nullopt;
