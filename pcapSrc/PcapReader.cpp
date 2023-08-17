@@ -35,7 +35,7 @@ bool PcapReader::ReadToBuffer(std::ifstream& infile) {
 }
 
 
-void PcapReader::SplitPacketsFromBuffer(std::queue<std::string> &queue) {
+void PcapReader::SplitPacketsFromBuffer(moodycamel::ReaderWriterQueue<std::string> &queue) {
     size_t curIndex = 0;
 
     while (curIndex < buffer.size()) {

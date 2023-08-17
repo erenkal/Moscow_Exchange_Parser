@@ -7,47 +7,54 @@
 #include "../Parser.h"
 #include "PCAPStructs.h"
 
-void PcapWriter::writePackets(std::queue<std::string> queue,std::ofstream & outfile) { //parse the pcap strings and write data to file
+constexpr int UDP_PAYLOAD_INDEX = 58;
+
+void PcapWriter::writePackets(moodycamel::ReaderWriterQueue<std::string> &queue,std::ofstream & outfile) { //parse the pcap strings and write data to file
     std::string output;
+    std::string packet;
     int i = 0;
-    std::cout << "Writing to file.. queue size: " << queue.size() << std::endl;
-    while (!queue.empty()) {
+    std::cout << "Writing to file.." << std::endl;
+    while (true) {
         i++;
-        std::string_view packet = queue.front();
-//        int index = PCAP_LENGTH_HEADER_LENGTH + ETHERNET_ETHERTYPE_INDEX ;
-//        auto ethernetType = Parser::parseNumeric<uint16_t>(index, packet);
-//        if (static_cast<EthernetIpProtocol>(ethernetType) != EthernetIpProtocol::kIPv4) {
-//            queue.pop();
-//            std::cout << "Found non-IPv4 packet, skipping..." << std::endl;
-//            continue;
-//        }
-//        index += IP_PROTOCOL_INDEX;
-//        auto ipProtocol = Parser::parseNumeric<uint8_t>(index, packet); // index is now at the end of IP protocol field
-//        index += IP_PROTOCOL_LEFT_SHIFT; // index is now at the end of IP protocol header length field
-//
-//        if (static_cast<IpProtocol>(ipProtocol) != IpProtocol::kUDP) {
-//            std::cout << "Found non-UDP packet, skipping..." << std::endl;
-//            queue.pop();
-//            continue;
-//        }
-//        index += UDP_HEADER_LENGTH; // index is now at the end of UDP header length field
-//        // index is now at the beginning of UDP payload
-        int index = 57;
+        bool result = queue.try_dequeue(packet);
+        if (!result) UNLIKELY // if queue is empty continue polling
+            continue;
+        if (packet == "EOF") UNLIKELY {// a hardcoded EOF packet is sent to the queue to indicate the end of the file
+            std::cout << "Found EOF packet, exiting..." << std::endl;
+            exit(0);
+            break;
+        }
 
-        std::string_view udpPayload = packet.substr(index+1); // index is +1 because of the 0 indexing of string
-//        std::cout << "UDP payload: " << udpPayload << std::endl;
+        //COMMENTED OUT CODE for finding UDP packets just to show reviewer how I would do it
 
-        //a primitive buffered writer
-        output.append(udpPayload);
+/*        int index = PCAP_LENGTH_HEADER_LENGTH + ETHERNET_ETHERTYPE_INDEX ;
+        auto ethernetType = Parser::parseNumeric<uint16_t>(index, packet);
+        if (static_cast<EthernetIpProtocol>(ethernetType) != EthernetIpProtocol::kIPv4) {
+            queue.pop();
+            std::cout << "Found non-IPv4 packet, skipping..." << std::endl;
+            continue;
+        }
+        index += IP_PROTOCOL_INDEX;
+        auto ipProtocol = Parser::parseNumeric<uint8_t>(index, packet); // index is now at the end of IP protocol field
+        index += IP_PROTOCOL_LEFT_SHIFT; // index is now at the end of IP protocol header length field
+
+        if (static_cast<IpProtocol>(ipProtocol) != IpProtocol::kUDP) {
+            std::cout << "Found non-UDP packet, skipping..." << std::endl;
+            queue.pop();
+            continue;
+        }
+        index += UDP_HEADER_LENGTH;
+        // index is now at the beginning of UDP payload */
+
+        int index = UDP_PAYLOAD_INDEX; // just using predefined index to make it faster
+
+        //a primitive buffered writer to write to file every 100000 packets
+        output.append(packet.substr(index));
         if (i % 100000 == 0) {
             std::cout << "Writing packet " << i << " to file." << std::endl;
             outfile.write(output.data(), output.size());
             output.clear();
         }
-        queue.pop();
-//        output.append(udpPayload);
     }
     std::cout << "Finished writing to file." << std::endl;
-//    outfile.write(output.data(), output.size());
-
 }

@@ -14,14 +14,17 @@ void SimbaWriter::writePackets(moodycamel::ReaderWriterQueue<std::string> &queue
     uint64_t startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); // simple benchmark tool
     int mod = 100000; // print a loading bar every 100000 packets
     int packetCount = 0;
+    std::string packet;
     while (true) {
-        std::string packet;
         bool result = queue.try_dequeue(packet);
 
          if (!result) UNLIKELY  // if queue is empty continue polling
             continue;
-         if (packet == "EOF") UNLIKELY  // a hardcoded EOF packet is sent to the queue to indicate the end of the file
+        if (packet == "EOF") UNLIKELY {// a hardcoded EOF packet is sent to the queue to indicate the end of the file
+            std::cout << "Found EOF packet, exiting..." << std::endl;
+            exit(0);
             break;
+        }
         if (packetCount % mod == 0) UNLIKELY  // print a loading bar every 100000 packets
             std::cout << "#" << std::flush;
 

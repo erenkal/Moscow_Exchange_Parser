@@ -14,6 +14,7 @@
 #include <span>
 #include <iostream>
 #include "PCAPStructs.h"
+#include "../3rdParty/readerwriterqueue.h"
 
 class PcapReader {
 public:
@@ -27,9 +28,7 @@ public:
 
     bool ReadToBuffer(std::ifstream &infile);
 
-    void SplitPacketsFromBuffer();
-
-    void SplitPacketsFromBuffer(std::queue<std::string> &queue);
+    void SplitPacketsFromBuffer(moodycamel::ReaderWriterQueue<std::string> &queue);
 
 private:
     std::string buffer; // buffer to read from

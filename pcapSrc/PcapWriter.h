@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <queue>
+#include "../3rdParty/readerwriterqueue.h"
 
 class PcapWriter {
 
@@ -15,7 +16,7 @@ class PcapWriter {
 public:
     PcapWriter() = default;
 
-    void writePackets(std::queue<std::string> queue,std::ofstream & outfile);
+    static void writePackets(moodycamel::ReaderWriterQueue<std::string> &queue,std::ofstream & outfile);
 
 
 
