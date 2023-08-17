@@ -85,8 +85,18 @@ struct IncrementalPacket {
     }
 
     size_t get_parsed_bytes() const { return parsed; }
-    std::string to_string() const;
-    friend std::ostream& operator<<(std::ostream& os, const IncrementalPacket& header);
+    std::string to_string() const{
+        std::string str;
+//        str += header.to_string();
+        for (const auto& sbe_message : sbe_messages) {
+            str += sbe_message.to_string();
+        }
+        return str;
+    };
+    friend std::ostream& operator<<(std::ostream& os, const IncrementalPacket& header){
+        os << header.to_string();
+        return os;
+    }
 };
 
 struct GroupSize{

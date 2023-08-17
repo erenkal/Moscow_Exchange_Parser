@@ -149,7 +149,18 @@ struct SbeMessage {
 //        }, order);
     }
 
-    std::string to_string() const;
+    std::string to_string() const{
+        std::string result;
+//        result += header.to_string();
+        result += std::visit([](auto&& arg) -> std::string {
+            if constexpr (!std::is_same_v<std::monostate, std::decay_t<decltype(arg)>>) {
+                return arg.to_string();
+            } else {
+                return "unknown message";
+            }
+        }, order);
+        return result;
+    };
     size_t get_parsed_bytes() const { return parsed; }
 
     friend std::ostream& operator<<(std::ostream& os, const SbeMessage& header);

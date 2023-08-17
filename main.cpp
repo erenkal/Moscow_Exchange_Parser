@@ -6,6 +6,7 @@
 #include "SimbaReader.h"
 #include "SimbaWriter.h"
 #include <queue>
+#include "3rdParty/NanoLog.h"
 
 
 
@@ -14,6 +15,20 @@ enum class ParseType {
     Pcap,
     Simba
 };
+
+
+void startNanoLog (const std::string& outputFile) {
+    /* We are using nanolog for simba messages output because it has a non-blocking and lock-free ring buffer implementation (which I
+     * find useful for high performance applications) and it is fast.
+     * If I couldn't use it I would implement a similar logger with ring buffer and lock-free synchronization.
+     *
+     * I have changed source code to not write any log type message (like timestamps etc.)
+     * It only writes the message itself.
+     * */
+    nanolog::initialize(nanolog::NonGuaranteedLogger(128), "./log", outputFile, 2000);
+    nanolog::set_log_level(nanolog::LogLevel::INFO);
+    LOG_CRIT << "Starting Simba Parser";
+}
 
 
 
@@ -69,6 +84,7 @@ int main(int argc, char* argv[]) {
         writer.writePackets(packets,outputStream);
     } else {
         std::cout << "Parsing Simba file" << std::endl;
+        startNanoLog(output_file);
         std::queue<std::string> packets;
         SimbaReader reader(64);
         int i = 0;
