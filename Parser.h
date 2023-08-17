@@ -60,19 +60,6 @@ private:
       }
     }
 
-    template<class T>
-    static T toHostOrder(T t) {
-      if (std::is_same<uint16_t, T>::value || std::is_same<int16_t, T>::value) {
-        return ntohs(t);
-      } else if (std::is_same<uint32_t, T>::value || std::is_same<int32_t, T>::value) {
-        return ntohl(t);
-      } else if (std::is_same<uint64_t, T>::value || std::is_same<int64_t, T>::value) {
-        return ntohll(t);
-      } else {
-        return t;
-      }
-    }
-
     static void removeSpaces(std::string &input) {
       input.erase(std::remove_if(std::begin(input), std::end(input), [l = std::locale{}](auto ch) {
           return std::isspace(ch, l);
@@ -176,6 +163,19 @@ public:
       T t = fromBytes<T>(std::string_view{source}.substr(sourceIndex, totalBytes));
 
       return toHostOrder(t);
+    }
+
+    template<class T>
+    static T toHostOrder(T t) {
+      if (std::is_same<uint16_t, T>::value || std::is_same<int16_t, T>::value) {
+        return ntohs(t);
+      } else if (std::is_same<uint32_t, T>::value || std::is_same<int32_t, T>::value) {
+        return ntohl(t);
+      } else if (std::is_same<uint64_t, T>::value || std::is_same<int64_t, T>::value) {
+        return ntohll(t);
+      } else {
+        return t;
+      }
     }
 };
 

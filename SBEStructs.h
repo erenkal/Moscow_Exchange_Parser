@@ -9,15 +9,19 @@
 #include <stdexcept>
 #include "OrderUpdate.h"
 #include "Parser.h"
+#include "OrderExecution.h"
+#include <iostream>
+#include <span>
+
 
 enum class MessageTypeValue {
     Heartbeat = 1,
     SequenceReset = 2,
     OrderBestPrices = 3,
     EmptyBook = 4,
-    OrderUpdate = 5,
-    OrderExecution = 6,
-    OrderBookSnapshotPacket = 7,
+    OrderUpdate = 15,
+    OrderExecution = 16,
+    OrderBookSnapshotPacket = 17,
     SecurityDefinition = 8,
     SecurityStatus = 9,
     SecurityDefinitionUpdateReport = 10,
@@ -25,6 +29,7 @@ enum class MessageTypeValue {
     Logon = 1000,
     Logout = 1001,
     MarketDataRequest = 1002,
+    kUnknown = 0
 };
 
 
@@ -42,9 +47,9 @@ struct TemplateId {
             case 2: { value = MessageTypeValue::SequenceReset; break;}
             case 3: { value = MessageTypeValue::OrderBestPrices; break;}
             case 4: { value = MessageTypeValue::EmptyBook; break;}
-            case 5: { value = MessageTypeValue::OrderUpdate; break;}
-            case 6: { value = MessageTypeValue::OrderExecution; break;}
-            case 7: { value = MessageTypeValue::OrderBookSnapshotPacket; break;}
+            case 15: { value = MessageTypeValue::OrderUpdate; break;}  //important
+            case 16: { value = MessageTypeValue::OrderExecution; break;} //important
+            case 17: { value = MessageTypeValue::OrderBookSnapshotPacket; break;} //important
             case 8: { value = MessageTypeValue::SecurityDefinition; break;}
             case 9: { value = MessageTypeValue::SecurityStatus; break;}
             case 10: { value = MessageTypeValue::SecurityDefinitionUpdateReport; break;}
@@ -52,7 +57,7 @@ struct TemplateId {
             case 1000: { value = MessageTypeValue::Logon; break;}
             case 1001: { value = MessageTypeValue::Logout; break;}
             case 1002: { value = MessageTypeValue::MarketDataRequest; break;}
-            default: {throw std::runtime_error("Bad message type");}
+            default: { value = MessageTypeValue::kUnknown; break;}
         }
     }
 
@@ -94,9 +99,11 @@ struct SbeMessageHeader {
     uint16_t version {};
 
     explicit SbeMessageHeader(std::string_view buffer){
+        std::string buffer_copy{buffer};
+        std::span<char> span{buffer_copy};
         int index = 0;
         block_length = Parser::parseNumeric<uint16_t>(index, buffer);
-        template_ID = TemplateId{Parser::parseNumeric<uint16_t>(index, buffer)};
+        template_ID = TemplateId{(Parser::parseNumeric<uint16_t>(index, buffer))};
         schema_ID = Parser::parseNumeric<uint16_t>(index, buffer);
         version = Parser::parseNumeric<uint16_t>(index, buffer);
     }
@@ -108,7 +115,7 @@ struct SbeMessageHeader {
 
 struct SbeMessage {
     constexpr static std::size_t SIZE = 8;
-    using OrderType = std::variant<std::monostate, OrderUpdate>;
+    using OrderType = std::variant<std::monostate, OrderUpdate,OrderExecution>;
 
     SbeMessageHeader header {};
     OrderType order;
@@ -118,14 +125,18 @@ struct SbeMessage {
     explicit SbeMessage(std::string_view buffer):
             header{SbeMessageHeader{buffer}} {
         parsed += SbeMessageHeader::SIZE;
+//        std::cout << "template id: " <<(uint16_t) header.template_ID.value << std::endl;
 
         switch (header.template_ID.value) {
 //            case MessageTypeValue::OrderBestPrices: { order = BestPricesOrder{reader}; break;}
             case MessageTypeValue::OrderUpdate: { order = OrderUpdate{buffer, parsed}; break;}
-//            case MessageTypeValue::OrderExecution: { order = OrderExecution{reader}; break;}
+            case MessageTypeValue::OrderExecution: { order = OrderExecution{buffer,parsed}; break;}
 //            case MessageTypeValue::OrderBookSnapshotPacket: { order = OrderBookSnapshotPacket{reader}; break;} //todo add other types
                 break;
-            default: throw std::runtime_error("Unsupported sbe message type");
+            default: {
+                order = std::monostate{};
+                break;
+            }
         }
 
 //        parsed += std::visit([this, &reader]<typename T>(T&& arg) -> uint32_t {

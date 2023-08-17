@@ -28,7 +28,7 @@ public:
         MarketDataPacketHeader header(buf);
         auto length = header.msg_size;
 //        auto length = Parser::parseNumeric<uint16_t>(index, buf);
-        std::cout << "length: " << length << std::endl;
+//        std::cout << "length: " << length << std::endl;
         return length;
     }
 

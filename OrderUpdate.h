@@ -93,12 +93,13 @@ struct OrderUpdate {
     int64_t  md_entry_px;
     int64_t  md_entry_size;
     MDFlags md_flags = MDFlags(0);
+    MDFlags md_flags2 = MDFlags(0);
     int32_t  security_id;
     uint32_t rpt_seq;
     uint8_t  md_update_action;
     uint8_t  md_entry_type;
 
-    static constexpr size_t SIZE = 42;
+    static constexpr size_t SIZE = 50;
     explicit OrderUpdate(std::string_view buffer, int32_t &index);
 
     static constexpr size_t get_parsed_bytes() { return SIZE; }
