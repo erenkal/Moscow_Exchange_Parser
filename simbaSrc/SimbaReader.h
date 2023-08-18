@@ -10,8 +10,8 @@
 #include <fstream>
 #include <queue>
 #include "SimbaStructs.h"
-#include "Parser.h"
-#include "3rdParty/readerwriterqueue.h"
+#include "../Parser.h"
+#include "../3rdParty/readerwriterqueue.h"
 #include <iostream>
 
 

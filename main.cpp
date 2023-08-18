@@ -3,8 +3,8 @@
 #include "pcapSrc/PCAPStructs.h"
 #include "pcapSrc/PcapReader.h"
 #include "pcapSrc/PcapWriter.h"
-#include "SimbaReader.h"
-#include "SimbaWriter.h"
+#include "simbaSrc/SimbaReader.h"
+#include "simbaSrc/SimbaWriter.h"
 #include <queue>
 #include <thread>
 #include "3rdParty/NanoLog.h"

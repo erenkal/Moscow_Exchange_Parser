@@ -4,7 +4,7 @@
 
 #include "SimbaWriter.h"
 #include "SimbaStructs.h"
-#include "3rdParty/NanoLog.h"
+#include "../3rdParty/NanoLog.h"
 
 
 

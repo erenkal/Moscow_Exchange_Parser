@@ -7,11 +7,116 @@
 #include <cstdint>
 #include <string>
 #include <stdexcept>
-#include "OrderUpdate.h"
-#include "Parser.h"
-#include "OrderExecution.h"
+#include "../Parser.h"
 #include <iostream>
 #include <span>
+
+constexpr int64_t INT64_NULL = -9223372036854775807LL - 1;  //used constexpr because it's safer
+constexpr int64_t DECIMAL5_NULL = 9223372036854775807;
+
+enum class Flags : uint64_t {
+    DAY = 0x1,
+    IOC = 0x2,
+    OTC = 0x4,
+    END_OF_TRANSACTION = 0x1000,
+    FILL_OR_KILL = 0x80000,
+    ORDER_MOVE_RESULT = 0x100000,
+    CANSEL_RESULT = 0x200000,
+    MESS_CANCEL_RESULT = 0x400000,
+    NEGOTIATED_ORDER= 0x4000000,
+    MULTI_LEG_OREDER= 0x8000000,
+    SIGN_OF_ORDER_DELETION_DUE_TO_A_CROSS_TRADE = 0x20000000,
+    CANCEL_OF_DISCONNECT_RESULT = 0x100000000,
+    SYNTHETIC_ORDER = 0x200000000000,
+    RFS_ORDER = 0x400000000000,
+};
+
+enum class MDPFlags : uint16_t {
+    kLastFragment     = 0x1,
+    kFirstSnapshotMsg = 0x2,
+    kLastSnapshotMsg  = 0x4,
+    kIncremental      = 0x8, //Important
+    kPossDupFlag      = 0x10,
+};
+
+struct MDFlags {
+    uint64_t value;
+
+    MDFlags(uint64_t value): value(value) {}
+
+    bool if_mask_active(Flags flag) const noexcept {
+        return (value & static_cast<uint64_t>(flag)) == static_cast<uint64_t>(flag);
+    }
+
+    std::string to_string() const {
+        std::string ret;
+
+        if (if_mask_active(Flags::DAY)) {
+            ret += "* 0x1 Day\n";
+        }
+        if (if_mask_active(Flags::IOC)) {
+            ret += "* 0x2 IOC\n";
+        }
+        if (if_mask_active(Flags::OTC)) {
+            ret += "* 0x4 OTC\n";
+        }
+        if (if_mask_active(Flags::END_OF_TRANSACTION)) {
+            ret += "* 0x1000 - End of transaction bit\n";
+        }
+        if (if_mask_active(Flags::FILL_OR_KILL)) {
+            ret += "* 0x80000 - Fill-or-Kill\n";
+        }
+        if (if_mask_active(Flags::ORDER_MOVE_RESULT)) {
+            ret += "* 0x100000 - The entry is the result of the order move\n";
+        }
+        if (if_mask_active(Flags::CANSEL_RESULT)) {
+            ret += "* 0x200000 - The entry is the result of the order cancel\n";
+        }
+        if (if_mask_active(Flags::MESS_CANCEL_RESULT)) {
+            ret += "* 0x400000 - The entry is the result of the orders mass cancel\n";
+        }
+        if (if_mask_active(Flags::NEGOTIATED_ORDER)) {
+            ret += "* 0x4000000 - Negotiated order\n";
+        }
+        if (if_mask_active(Flags::MULTI_LEG_OREDER)) {
+            ret += "* 0x8000000 - Multi-leg order\n";
+        }
+        if (if_mask_active(Flags::SIGN_OF_ORDER_DELETION_DUE_TO_A_CROSS_TRADE)) {
+            ret += "* 0x20000000 - Sign of order deletion due to a cross-trade\n";
+        }
+        if (if_mask_active(Flags::CANCEL_OF_DISCONNECT_RESULT)) {
+            ret += "* 0x100000000 - The entry is the result of the orders cancel by \"Cancel on Disconnect\" service\n";
+        }
+        if (if_mask_active(Flags::SYNTHETIC_ORDER)) {
+            ret += "* 0x200000000000 - Synthetic order\n";
+        }
+        if (if_mask_active(Flags::RFS_ORDER)) {
+            ret += "* 0x400000000000 - RFS order\n";
+        }
+        return ret;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const MDFlags& update_order) {
+        os << update_order.to_string();
+        return os;
+    }
+};
+
+struct Decimal5Null {
+    uint64_t mantissa{9223372036854775807};
+    uint8_t exponent= -5;
+    Decimal5Null() = default;
+    Decimal5Null(uint64_t mantissa) : mantissa(mantissa) {}
+    [[nodiscard]] std::string to_string() const {
+        if (mantissa == DECIMAL5_NULL) {
+            return "NULL";
+        }
+        std::string mantissa_str = std::to_string(mantissa);
+        return mantissa_str.length() <= 5 ?  //converting mantissa to decimal
+               mantissa_str.insert(0, 6 - mantissa_str.length(), '0').insert(1, ".") :
+               mantissa_str.insert(mantissa_str.length() - 5, ".");
+    }
+};
 
 
 enum class MessageTypeValue {
@@ -33,7 +138,16 @@ enum class MessageTypeValue {
 };
 
 
-
+enum class MDUpdateActionValue : uint8_t{
+    NEW = 0,
+    CHANGE = 1,
+    DELETE = 2
+};
+enum class MDEntryTypeValue : uint8_t {
+    BID = 48,
+    ASK = 49,
+    EMPTY_BOOK = 74
+};
 
 
 struct TemplateId {
@@ -113,56 +227,5 @@ struct SbeMessageHeader {
     friend std::ostream& operator<<(std::ostream& os, const SbeMessageHeader& header);
 };
 
-struct SbeMessage {
-    constexpr static std::size_t SIZE = 8;
-    using OrderType = std::variant<std::monostate, OrderUpdate,OrderExecution>;
 
-    SbeMessageHeader header {};
-    OrderType order;
-
-    int32_t parsed {};
-
-    explicit SbeMessage(std::string_view buffer):
-            header{SbeMessageHeader{buffer}} {
-        parsed += SbeMessageHeader::SIZE;
-//        std::cout << "template id: " <<(uint16_t) header.template_ID.value << std::endl;
-
-        switch (header.template_ID.value) {
-//            case MessageTypeValue::OrderBestPrices: { order = BestPricesOrder{reader}; break;}
-            case MessageTypeValue::OrderUpdate: { order = OrderUpdate{buffer, parsed}; break;}
-            case MessageTypeValue::OrderExecution: { order = OrderExecution{buffer,parsed}; break;}
-//            case MessageTypeValue::OrderBookSnapshotPacket: { order = OrderBookSnapshotPacket{reader}; break;} //todo add other types
-                break;
-            default: {
-                order = std::monostate{};
-                break;
-            }
-        }
-
-//        parsed += std::visit([this, &reader]<typename T>(T&& arg) -> uint32_t {
-//            if constexpr (!std::is_same_v<std::monostate, std::decay_t<T>>) {
-//                return arg.get_parsed_bytes();
-//            } else {
-//                reader.skip(header.block_length);
-//                return header.block_length;
-//            }
-//        }, order);
-    }
-
-    std::string to_string() const{
-        std::string result;
-//        result += header.to_string();
-        result += std::visit([](auto&& arg) -> std::string {
-            if constexpr (!std::is_same_v<std::monostate, std::decay_t<decltype(arg)>>) {
-                return arg.to_string();
-            } else {
-                return "unknown message";
-            }
-        }, order);
-        return result;
-    };
-    size_t get_parsed_bytes() const { return parsed; }
-
-    friend std::ostream& operator<<(std::ostream& os, const SbeMessage& header);
-};
 #endif //PARSER_SBESTRUCTS_H

@@ -4,8 +4,8 @@
 
 #include <cstdint>
 #include "SimbaReader.h"
-#include "pcapSrc/PcapReader.h"
-#include "3rdParty/readerwriterqueue.h"
+#include "../pcapSrc/PcapReader.h"
+#include "../3rdParty/readerwriterqueue.h"
 
 SimbaReader::SimbaReader(uint32_t readChunkSizeInMB) {
     readChunkSize = readChunkSizeInMB * 1024 * 1024;

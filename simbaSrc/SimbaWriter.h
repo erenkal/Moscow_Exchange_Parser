@@ -8,7 +8,7 @@
 
 #include <queue>
 #include <fstream>
-#include "3rdParty/readerwriterqueue.h"
+#include "../3rdParty/readerwriterqueue.h"
 
 class SimbaWriter {
 
