@@ -16,8 +16,6 @@ OrderUpdate::OrderUpdate(std::string_view buffer, int32_t &index) {
     rpt_seq = Parser::parseNumeric<uint32_t>(index, buffer);
     md_update_action = static_cast<MDUpdateActionValue>(Parser::parseNumeric<uint8_t>(index, buffer));
     md_entry_type = static_cast<MDEntryTypeValue>(Parser::parseNumeric<uint8_t>(index, buffer));
-
-
 }
 
 std::ostream &operator<<(std::ostream &os, const OrderUpdate &update_order) {

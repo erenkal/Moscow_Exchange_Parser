@@ -18,7 +18,7 @@ class SimbaWriter {
     moodycamel::ReaderWriterQueue<std::shared_ptr<MarketDataPacket>> mdpQ{1000000};
 
 
-    bool isStart = false;
+    bool isStart = false; // running check for log_async
     std::atomic<int> writtenPacketCount = 0;
     std::atomic<int> parsedPacketCount = 0;
 

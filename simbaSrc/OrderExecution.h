@@ -10,11 +10,6 @@
 #include <sstream>
 #include "SBEStructs.h"
 
-
-
-
-
-
 struct OrderExecution {
     int64_t md_entry_id;
     Decimal5Null md_entry_px;
@@ -54,7 +49,6 @@ struct OrderExecution {
         str += "-----------------------------\n";
         return str;
     }
-
 
     friend std::ostream& operator<<(std::ostream& os, const OrderExecution& execution_order);
 };

@@ -33,7 +33,6 @@ public:
         return length;
     }
 
-
     bool ReadToBuffer(std::ifstream &infile);
 
 private:

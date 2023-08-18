@@ -39,16 +39,12 @@ void SimbaReader::SplitPacketsFromBuffer(moodycamel::ReaderWriterQueue<std::stri
     while (curIndex < buffer.size()) {
         std::string_view leftBuffer(buffer.data() + curIndex, buffer.size() - curIndex);
         const auto packetLength = GetDatagramLength(leftBuffer);
-
         if (!packetLength.has_value() || curIndex + packetLength.value() > buffer.size()) {
             break;
         }
-
         queue.emplace(leftBuffer.data(), packetLength.value());
         curIndex += packetLength.value();
     }
-
-    //  buffer.erase(buffer.begin(), buffer.begin() + curIndex);
 
     leftBytes = buffer.size() - curIndex;
 }

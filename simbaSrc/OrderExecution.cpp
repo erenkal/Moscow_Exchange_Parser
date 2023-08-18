@@ -8,7 +8,6 @@
 #include "../Parser.h"
 
 OrderExecution::OrderExecution(std::string_view buffer, int32_t &index) {
-
     md_entry_id = Parser::parseNumeric<int64_t>(index, buffer);
     md_entry_px = Parser::parseNumeric<int64_t>(index, buffer);
     md_entry_size = Parser::parseNumeric<int64_t>(index, buffer);

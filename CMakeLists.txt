@@ -11,4 +11,4 @@ add_executable(parser
         main.cpp
         pcapSrc/PCAPStructs.h Parser.h pcapSrc/PcapReader.cpp pcapSrc/PcapReader.h pcapSrc/PcapWriter.cpp
         pcapSrc/PcapWriter.h simbaSrc/SimbaStructs.h simbaSrc/SimbaReader.cpp simbaSrc/SimbaReader.h simbaSrc/SimbaWriter.cpp simbaSrc/SimbaWriter.h simbaSrc/SBEStructs.h
-        simbaSrc/OrderUpdate.cpp simbaSrc/OrderUpdate.h simbaSrc/OrderExecution.cpp simbaSrc/OrderExecution.h 3rdParty/NanoLog.h 3rdParty/NanoLog.cpp 3rdParty/readerwriterqueue.h simbaSrc/SnapShot.cpp simbaSrc/SnapShot.h)
+        simbaSrc/OrderUpdate.cpp simbaSrc/OrderUpdate.h simbaSrc/OrderExecution.cpp simbaSrc/OrderExecution.h 3rdParty/NanoLog.h 3rdParty/NanoLog.cpp 3rdParty/readerwriterqueue.h simbaSrc/SnapShot.h)

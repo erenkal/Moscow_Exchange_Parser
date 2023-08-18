@@ -221,7 +221,6 @@ struct TemplateId {
         }
     }
 
-
     friend std::ostream& operator<<(std::ostream& os, const TemplateId& message) {
         os << message.to_string();
         return os;

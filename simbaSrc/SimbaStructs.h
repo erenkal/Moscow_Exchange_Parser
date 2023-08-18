@@ -41,17 +41,14 @@ constexpr int MARKET_DATA_PACKET_HEADER_SIZE_INDEX = 4;
 struct SbeMessage {
     constexpr static std::size_t SIZE = 8;
     using OrderType = std::variant<std::monostate, OrderUpdate,OrderExecution>;
-
     SbeMessageHeader header {};
     OrderType order;
-
     int32_t parsed {};
 
     explicit SbeMessage(std::string_view buffer):
             header{SbeMessageHeader{buffer}} {
         parsed += SbeMessageHeader::SIZE;
 //        std::cout << "template id: " <<(uint16_t) header.template_ID.value << std::endl;
-
         switch (header.template_ID.value) {  //other types are not implemented
             case MessageTypeValue::OrderUpdate: { order = OrderUpdate{buffer, parsed}; break;}
             case MessageTypeValue::OrderExecution: { order = OrderExecution{buffer,parsed}; break;}
@@ -76,7 +73,6 @@ struct SbeMessage {
         return result;
     };
     size_t get_parsed_bytes() const { return parsed; }
-
     friend std::ostream& operator<<(std::ostream& os, const SbeMessage& header);
 };
 
@@ -123,7 +119,7 @@ struct IncrementalPacket {
     }
 
     size_t get_parsed_bytes() const { return parsed; }
-    std::string to_string() const{
+    [[nodiscard]] std::string to_string() const{
         std::string str;
 //        str += header.to_string();
         for (const auto& sbe_message : sbe_messages) {

@@ -42,12 +42,10 @@ struct OrderUpdate {
         str += "Entry Type: " + MDEntryTypeValueToString(md_entry_type); ;
         str += "\n";
 
-
         str += "-----------------------------\n";
 
         return str;
     }
-
 
     friend std::ostream& operator<<(std::ostream& os, const OrderUpdate& update_order);
 };
