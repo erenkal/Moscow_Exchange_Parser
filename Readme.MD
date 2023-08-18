@@ -19,6 +19,7 @@ Also our methods supports Little endian to Big endian conversions vice versa. (a
 When I first tried to create strings for logging I can only get 20~ seconds for 2.5 million packets. So I have started creating them in an async thread (it can also be done in a thread pool)
 and I have used a non-blocking logger (nanolog) to write the output file. It has improved the performance a lot. Now I can get 0.7-1.5 seconds for decoding 2.5 million packets. (depends on the load of my machine)
 It sounds trivial but in a real world scenario logging should be done in a separate thread like this.
+We also used likely and unlikely(c++23) attributes to help the compiler to optimize the code with branch prediction.
 
 ## Building:
 Ensure you have CMake and an appropriate build system (like Ninja or Make) installed on your system.
@@ -89,7 +90,15 @@ Exchange Trading Session ID: 6785
     Entry Type: ASK
 ---- End of Snapshot Packet ----
 ```
-
+## Used C++ Concepts:
+- **Templates**
+- **Single Writer Single Reader Lock Free Queue**: Written with atomic structures. Used for maximum performance.
+- **Non Blocking Logger**
+- **Attributes**: Used for helping the compiler to optimize the code.
+- **string_view**: std::span can also be used but I am more familiar with string_view.
+- **atomic_structures**
+- **macros for network byte order conversions**: (not used in this project after testing)
+- and many more...
 ## Further Improvements:
 I want to implement the following improvements in the future:
 - **Better Error Handling**: Currently, the parser does not handle errors very well. It simply exits the program when an error occurs. I want to implement a better error handling system that will allow the parser to continue parsing even if an error occurs.

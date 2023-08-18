@@ -239,7 +239,7 @@ struct SbeMessageHeader {
 
     explicit SbeMessageHeader(std::string_view buffer){
         std::string buffer_copy{buffer};
-        std::span<char> span{buffer_copy};
+//        std::span<char> span{buffer_copy}; //std::span is also can be used instead of std::string_view but it is a new feature and it cannot be supported by all compilers
         int index = 0;
         block_length = Parser::parseNumeric<uint16_t>(index, buffer);
         template_ID = TemplateId{(Parser::parseNumeric<uint16_t>(index, buffer))};

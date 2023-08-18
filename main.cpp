@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
         std::queue<std::string> packets;
         moodycamel::ReaderWriterQueue<std::string> asyncPackets(200000);
         std::ofstream outputStream(output_file, std::ios::binary);
-        auto decoder = std::thread([&](){
+        auto decoder = std::thread([&](){ //thread for decoding packets and writing them to output file
             PcapWriter::writePackets(asyncPackets, outputStream);
         });
         decoder.detach();
@@ -89,12 +89,6 @@ int main(int argc, char* argv[]) {
         while (true){
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
-
-        //we have all the packets in the queue now
-        //it is better to use a thread pool here and write to the file in parallel to buffer reading
-        //but for now we will just write to the file
-        //todo thread pool and sequential blocking writing
-
     } else {
         std::cout << "Parsing Simba file" << std::endl;
         startNanoLog(output_file);
@@ -103,18 +97,18 @@ int main(int argc, char* argv[]) {
         int i = 0;
         moodycamel::ReaderWriterQueue<std::string> asyncPackets(200000);
         SimbaWriter writer;
-        auto decoder = std::thread([&](){
+        auto decoder = std::thread([&](){  //thread for decoding packets and writing them to output file
             writer.parsePackets(asyncPackets);
         });
         decoder.detach();
-        while (reader.ReadToBuffer(inputStream)){
-            reader.SplitPacketsFromBuffer(asyncPackets);
+        while (reader.ReadToBuffer(inputStream)){ //read packets from input file and put them in a buffer
+            reader.SplitPacketsFromBuffer(asyncPackets); //split packets from buffer and put them in a queue
             std::cout << i++ << "th buffer read" <<std::endl;
         }
         std::cout << "finished reading" << std::endl;
         asyncPackets.enqueue("EOF");
         while (true){
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(std::chrono::seconds(5)); //keep main thread alive
         }
 
     }
