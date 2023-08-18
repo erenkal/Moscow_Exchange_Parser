@@ -19,8 +19,8 @@ struct OrderUpdate {
     MDFlags md_flags2 = MDFlags(0);
     int32_t  security_id;
     uint32_t rpt_seq;
-    uint8_t  md_update_action;
-    uint8_t  md_entry_type;
+    MDUpdateActionValue  md_update_action;
+    MDEntryTypeValue  md_entry_type;
 
     static constexpr size_t SIZE = 50;
     explicit OrderUpdate(std::string_view buffer, int32_t &index);
@@ -30,7 +30,7 @@ struct OrderUpdate {
     [[nodiscard]] std::string to_string() const {
         std::string str;
         str.reserve(250);
-        str += "------ Order Details ------\n";
+        str += "------ Order Update ------\n";
 
         str += "Order ID: " + std::to_string(md_entry_id) + "\n";
         str += "Order price: " + md_entry_px.to_string() + "\n";
@@ -38,8 +38,8 @@ struct OrderUpdate {
         str += "Order type (bit mask): \n" + md_flags.to_string() + "\n";
         str += "Instrument numeric code: " + std::to_string(security_id) + "\n";
         str += "Incremental refresh sequence number: " + std::to_string(rpt_seq) + "\n";
-        str += "Incremental refresh type: " + std::to_string(static_cast<uint8_t>(md_update_action)) + "\n"; // assuming that md_update_action can be cast to uint8_t
-        str += &"\t\t Entry Type: " [ static_cast<char>(md_entry_type)];
+        str += "Type : " + MDUpdateActionValueToString(md_update_action) + "\n";
+        str += "Entry Type: " + MDEntryTypeValueToString(md_entry_type); ;
         str += "\n";
 
 

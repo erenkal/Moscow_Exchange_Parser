@@ -9,12 +9,20 @@
 #include <queue>
 #include <fstream>
 #include "../3rdParty/readerwriterqueue.h"
+#include "SimbaStructs.h"
 
 class SimbaWriter {
 
-    std::string_view ParsePacket(std::string_view buf);
-
     std::string_view ParsePacket(std::string_view buf, bool isIncremental);
+
+    moodycamel::ReaderWriterQueue<std::shared_ptr<MarketDataPacket>> mdpQ{1000000};
+
+
+    bool isStart = false;
+    std::atomic<int> writtenPacketCount = 0;
+    std::atomic<int> parsedPacketCount = 0;
+
+    std::atomic<bool> ended = false;
 
 public:
     SimbaWriter() = default;
@@ -22,7 +30,9 @@ public:
     SimbaWriter& operator=(const SimbaWriter&) = delete;
     SimbaWriter(SimbaWriter&&) = delete;
 
-    static void writePackets(moodycamel::ReaderWriterQueue<std::string> &queue);
+    void parsePackets(moodycamel::ReaderWriterQueue<std::string> &queue);
+
+    void log_async();
 };
 
 

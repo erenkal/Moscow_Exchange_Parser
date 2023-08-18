@@ -51,14 +51,14 @@ struct MDEntry{
         std::string str;
         str.reserve(250);
         str += "\t\t MDEntry\n";
-        str += "\t\t Entry Id : " + std::to_string(md_entry_id) + "\n";
+        str += "\t\t Entry Id : " + std::to_string(md_entry_id == INT64_NULL ? 0 : md_entry_id  ) + "\n";
         str += "\t\t Transaction Time: " + std::to_string(transact_time) + "\n";
         str += "\t\t Price: " + md_entry_px_mantissa.to_string() + "\n";
-        str += "\t\t Entry Size: " + std::to_string(md_entry_size) + "\n";
-        str += "\t\t Trade Id: " + std::to_string(trade_id) + "\n";
+        str += "\t\t Entry Size: " + std::to_string(md_entry_size== INT64_NULL? 0:md_entry_size) + "\n";
+        str += "\t\t Trade Id: " + std::to_string(trade_id == INT64_NULL ? 0 : trade_id ) + "\n";
         str += "\t\t Flags : " + md_flags.to_string()+ "\n";
 //        str += "\t\t md_flags2: " + md_flags2.to_string()+ "\n"; // empty
-        str += &"\t\t Entry Type: " [ static_cast<char>(md_entry_type)];
+        str += "\t\t Entry Type: " + MDEntryTypeValueToString(md_entry_type);
         str += "\n";
         return str;
     }

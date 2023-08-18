@@ -14,6 +14,8 @@
 constexpr int64_t INT64_NULL = -9223372036854775807LL - 1;  //used constexpr because it's safer
 constexpr int64_t DECIMAL5_NULL = 9223372036854775807;
 
+
+
 enum class Flags : uint64_t {
     DAY = 0x1,
     IOC = 0x2,
@@ -143,12 +145,36 @@ enum class MDUpdateActionValue : uint8_t{
     CHANGE = 1,
     DELETE = 2
 };
+
+constexpr std::string MDUpdateActionValueToString(MDUpdateActionValue val) {
+    switch (val) {
+        case MDUpdateActionValue::NEW:
+            return "NEW";
+        case MDUpdateActionValue::CHANGE:
+            return "CHANGE";
+        case MDUpdateActionValue::DELETE:
+            return "DELETE";
+        default:
+            return "UNKNOWN";
+    }
+}
 enum class MDEntryTypeValue : uint8_t {
     BID = 48,
     ASK = 49,
     EMPTY_BOOK = 74
 };
-
+constexpr std::string MDEntryTypeValueToString(MDEntryTypeValue val) { //constexpr - compile time in c++
+    switch (val) {
+        case MDEntryTypeValue::BID:
+            return "BID";
+        case MDEntryTypeValue::ASK:
+            return "ASK";
+        case MDEntryTypeValue::EMPTY_BOOK:
+            return "EMPTY_BOOK";
+        default:
+            return "UNKNOWN";
+    }
+}
 
 struct TemplateId {
     MessageTypeValue value;

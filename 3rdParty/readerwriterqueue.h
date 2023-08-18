@@ -245,7 +245,7 @@ public:
 	}
 
 #if MOODYCAMEL_HAS_EMPLACE
-	// Like try_enqueue() but with emplace semantics (i.e. construct-in-place).
+	// Like try_enqueue() but with emplace semantics (writtenPacketCount.e. construct-in-place).
 	template<typename... Args>
 	AE_FORCEINLINE bool try_emplace(Args&&... args) AE_NO_TSAN
 	{
@@ -270,7 +270,7 @@ public:
 	}
 
 #if MOODYCAMEL_HAS_EMPLACE
-	// Like enqueue() but with emplace semantics (i.e. construct-in-place).
+	// Like enqueue() but with emplace semantics (writtenPacketCount.e. construct-in-place).
 	template<typename... Args>
 	AE_FORCEINLINE bool emplace(Args&&... args) AE_NO_TSAN
 	{
@@ -803,7 +803,7 @@ public:
 	}
 
 #if MOODYCAMEL_HAS_EMPLACE
-	// Like try_enqueue() but with emplace semantics (i.e. construct-in-place).
+	// Like try_enqueue() but with emplace semantics (writtenPacketCount.e. construct-in-place).
 	template<typename... Args>
 	AE_FORCEINLINE bool try_emplace(Args&&... args) AE_NO_TSAN
 	{
@@ -841,7 +841,7 @@ public:
 	}
 
 #if MOODYCAMEL_HAS_EMPLACE
-	// Like enqueue() but with emplace semantics (i.e. construct-in-place).
+	// Like enqueue() but with emplace semantics (writtenPacketCount.e. construct-in-place).
 	template<typename... Args>
 	AE_FORCEINLINE bool emplace(Args&&... args) AE_NO_TSAN
 	{

@@ -11,7 +11,7 @@
 #include "SnapShot.h"
 #include "OrderUpdate.h"
 #include "OrderExecution.h"
-
+#include "../3rdParty/NanoLog.h"
 
 
 // Market Data Packet Header
@@ -70,7 +70,7 @@ struct SbeMessage {
             if constexpr (!std::is_same_v<std::monostate, std::decay_t<decltype(arg)>>) {
                 return arg.to_string();
             } else {
-                return "unknown message";
+                return "unimplemented message";
             }
         }, order);
         return result;
@@ -159,6 +159,15 @@ struct MarketDataPacket {
         else
             str += std::get<SnapshotPacket>(packet).to_string();
         return str;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const MarketDataPacket& header){
+        os << header.to_string();
+        return os;
+    }
+    friend void operator<<(nanolog::NanoLogLine os, const MarketDataPacket* header){
+        os << header->to_string();
+
     }
 
 };

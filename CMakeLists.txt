@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../parser)
 
 #make o3
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -o2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -o3")
 
 add_executable(parser
         main.cpp

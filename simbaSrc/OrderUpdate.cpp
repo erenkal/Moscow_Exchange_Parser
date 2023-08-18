@@ -14,8 +14,8 @@ OrderUpdate::OrderUpdate(std::string_view buffer, int32_t &index) {
     md_flags2 = Parser::parseNumeric<uint64_t>(index, buffer);
     security_id = Parser::parseNumeric<int32_t>(index, buffer);
     rpt_seq = Parser::parseNumeric<uint32_t>(index, buffer);
-    md_update_action = Parser::parseNumeric<uint8_t>(index, buffer);
-    md_entry_type = Parser::parseNumeric<uint8_t>(index, buffer);
+    md_update_action = static_cast<MDUpdateActionValue>(Parser::parseNumeric<uint8_t>(index, buffer));
+    md_entry_type = static_cast<MDEntryTypeValue>(Parser::parseNumeric<uint8_t>(index, buffer));
 
 
 }

@@ -17,7 +17,7 @@
 
 struct OrderExecution {
     int64_t md_entry_id;
-    int64_t md_entry_px;
+    Decimal5Null md_entry_px;
     int64_t md_entry_size;
     Decimal5Null last_px;
     int64_t last_qty;
@@ -39,16 +39,16 @@ struct OrderExecution {
         str.reserve(250);
         str += "------ Order Execution ------\n";
         str += "Order ID: " + std::to_string(md_entry_id) + "\n";
-        str += "Order Price: " + std::to_string(md_entry_px) + "\n";
-        str += "Remaining quantity in the order: " + std::to_string(md_entry_size) + "\n";
+        str += "Order Price: " + md_entry_px.to_string() + "\n";
+        str += "Remaining quantity in the order: " + std::to_string(md_entry_size == INT64_NULL ? 0 : md_entry_size  ) + "\n";
         str += "Trade price: " + last_px.to_string() + "\n";
         str += "Trade volume: " + std::to_string(last_qty) + "\n";
         str += "Trade ID: " + std::to_string(trade_id) + "\n";
         str += "Trade type (Flags): " + std::to_string(md_flags) + "\n";
         str += "Security ID: " + std::to_string(security_id) + "\n";
         str += "Incremental refresh sequence number: " + std::to_string(rpt_seq) + "\n";
-        str += "Incremental refresh type: " + std::to_string(static_cast<uint8_t>(md_update_action)) + "\n";
-        str += &"\t\t Entry Type: " [ static_cast<char>(md_entry_type)] ;
+        str += "Type : " + MDUpdateActionValueToString(md_update_action) + "\n";
+        str += "Entry Type: " + MDEntryTypeValueToString(md_entry_type); ;
         str += "\n";
 
         str += "-----------------------------\n";

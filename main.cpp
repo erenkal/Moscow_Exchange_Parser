@@ -95,10 +95,6 @@ int main(int argc, char* argv[]) {
         //but for now we will just write to the file
         //todo thread pool and sequential blocking writing
 
-
-
-
-
     } else {
         std::cout << "Parsing Simba file" << std::endl;
         startNanoLog(output_file);
@@ -106,8 +102,9 @@ int main(int argc, char* argv[]) {
         SimbaReader reader(64);
         int i = 0;
         moodycamel::ReaderWriterQueue<std::string> asyncPackets(200000);
+        SimbaWriter writer;
         auto decoder = std::thread([&](){
-            SimbaWriter::writePackets(asyncPackets);
+            writer.parsePackets(asyncPackets);
         });
         decoder.detach();
         while (reader.ReadToBuffer(inputStream)){
@@ -116,10 +113,6 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "finished reading" << std::endl;
         asyncPackets.enqueue("EOF");
-
-        SimbaWriter writer;
-        std::ofstream outputStream(output_file, std::ios::binary);
-
         while (true){
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
