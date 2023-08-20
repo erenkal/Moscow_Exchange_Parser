@@ -103,7 +103,7 @@ Exchange Trading Session ID: 6785
 I want to implement the following improvements in the future:
 - **Better Error Handling**: Currently, the parser does not handle errors very well. It simply exits the program when an error occurs. I want to implement a better error handling system that will allow the parser to continue parsing even if an error occurs.
 - **Better Performance**: I want to implement a better performance system that will allow the parser to parse the files faster.
-- **Thread Pooling**: Since we are parsing a big file and we have to parse it in chunks, we can use thread pooling to parse the chunks in parallel. This will improve the performance of the parser. But in the real market data parsing I think it won't make a big difference (especially when data is sent from different parts) but it can be tested.
+- **Thread Pooling**: Since we are parsing a big file and we have to parse it in chunks, we can use thread pooling to parse the chunks in parallel. This could improve the performance of the parser. But in the real market data parsing I think it won't make a big difference (especially when data is sent from different parts) but it can be tested.
 - **Sequential Writer**: We can also use a sequential writer written with atomic structures to write the output file. But our nanolog implementation is better because it's nonblocking.
 - **More Message Types**: Other message types can be implemented in the future.
 
