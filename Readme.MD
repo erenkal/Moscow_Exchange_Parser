@@ -1,5 +1,5 @@
 
-# PCAP and Simba Parser
+# MOEX Parser (PCAP and Simba Parser)
 
 This project provides a custom-built parser for `.pcap` files (commonly used for capturing network traffic) and the Simba binary protocol format (used by the Moscow Exchange). It uses C++23 features and is built using CMake.
 Especially Simba part is written with great care and attention to details.
