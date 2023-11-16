@@ -6,7 +6,7 @@ Especially Simba part is written with great care and attention to details.
 ## Project Highlights:
 - **Parsing Types**: The parser can parse both `.pcap` files and Simba binary protocol files.
 - **Performance Improvement**: Reduced the Simba file parsing time from an initial 73 seconds (first version of code) to a final 0.7-1.5 seconds with average packet read time 250-500 nanoseconds on my macbook air depends on the load. 
-(There are improvements that can be made to further reduce the time but I have not implemented them due to time constraints)
+(There are improvements that can be made to further reduce the time)
 - **Code Readability**: The code is well documented and easy to understand.
 
 ## Parser's Architecture:
